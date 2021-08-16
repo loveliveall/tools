@@ -31,6 +31,7 @@ module.exports = {
       ignoreComments: true,
     }],
     'react/prop-types': 'off',
+    'react/require-default-props': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/member-delimiter-style': ['error', {
       multiline: {

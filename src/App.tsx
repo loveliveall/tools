@@ -5,6 +5,7 @@ import {
 } from '@chakra-ui/react';
 
 import AppBar from '@/components/app-frame/AppBar';
+import NavBar from '@/components/app-frame/NavBar';
 import Content from '@/components/app-frame/Content';
 
 function Comp1() {
@@ -19,6 +20,7 @@ function App() {
   return (
     <Box>
       <AppBar />
+      <NavBar />
       <Content>
         <Switch>
           <Route path="/ex1" component={Comp1} />
