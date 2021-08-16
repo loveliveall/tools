@@ -2,18 +2,23 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import {
   Box,
+  Text,
 } from '@chakra-ui/react';
 
 import AppBar from '@/components/app-frame/AppBar';
 import NavBar from '@/components/app-frame/NavBar';
 import Content from '@/components/app-frame/Content';
 
-function Comp1() {
-  return <div>Component 1</div>;
-}
+import CCPNormal from '@/pages/ccp-normal';
 
-function Comp2() {
-  return <div>Component 2</div>;
+import { RoutePath } from '@/routes';
+
+function Fallback() {
+  return (
+    <Text>
+      메뉴를 선택해주세요
+    </Text>
+  );
 }
 
 function App() {
@@ -24,9 +29,8 @@ function App() {
       <NavBar isOpen={navBarOpen} onClose={() => setNavBarOpen(false)} />
       <Content>
         <Switch>
-          <Route path="/ex1" component={Comp1} />
-          <Route path="/ex2" component={Comp2} />
-          <Route component={() => <div>Hello World</div>} />
+          <Route path={RoutePath.CCPNormal} component={CCPNormal} />
+          <Route component={Fallback} />
         </Switch>
       </Content>
     </Box>
