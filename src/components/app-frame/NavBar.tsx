@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  useDisclosure,
   Box,
   Drawer,
   DrawerContent,
@@ -13,8 +12,11 @@ import {
 import { DESKTOP_BP, APP_BAR_HEIGHT, NAV_BAR_WIDTH } from '@/consts';
 import NavBarContent from './NavBarContent';
 
-function NavBar() {
-  const { isOpen, onClose } = useDisclosure();
+type NavBarProps = {
+  isOpen: boolean,
+  onClose: () => void,
+};
+function NavBar({ isOpen, onClose }: NavBarProps) {
   return (
     <>
       {/* Mobile UI */}
@@ -25,8 +27,8 @@ function NavBar() {
           <DrawerHeader>
             Toolbox
           </DrawerHeader>
-          <DrawerBody>
-            <NavBarContent />
+          <DrawerBody p={0}>
+            <NavBarContent onNavBarClose={onClose} />
           </DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -38,7 +40,7 @@ function NavBar() {
         d={{ base: 'none', [DESKTOP_BP]: 'flex' }}
         w={NAV_BAR_WIDTH}
       >
-        <NavBarContent />
+        <NavBarContent onNavBarClose={onClose} />
       </Box>
     </>
   );

@@ -17,10 +17,11 @@ function Comp2() {
 }
 
 function App() {
+  const [navBarOpen, setNavBarOpen] = React.useState(false);
   return (
     <Box>
-      <AppBar />
-      <NavBar />
+      <AppBar setNavBarOpen={setNavBarOpen} />
+      <NavBar isOpen={navBarOpen} onClose={() => setNavBarOpen(false)} />
       <Content>
         <Switch>
           <Route path="/ex1" component={Comp1} />

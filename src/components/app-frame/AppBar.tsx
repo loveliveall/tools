@@ -7,11 +7,14 @@ import {
   IconButton,
   Spacer,
 } from '@chakra-ui/react';
-import { BiSun, BiMoon } from 'react-icons/bi';
+import { BiSun, BiMoon, BiMenu } from 'react-icons/bi';
 
-import { APP_BAR_HEIGHT } from '@/consts';
+import { APP_BAR_HEIGHT, DESKTOP_BP } from '@/consts';
 
-function AppBar() {
+type AppBarProps = {
+  setNavBarOpen: (newV: boolean) => void,
+};
+function AppBar({ setNavBarOpen }: AppBarProps) {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Box
@@ -22,9 +25,18 @@ function AppBar() {
       h={APP_BAR_HEIGHT}
     >
       <HStack h="full" p={4}>
-        <Heading size="md">
-          ToolBox
-        </Heading>
+        <HStack>
+          <IconButton
+            aria-label="Open navbar"
+            display={{ base: 'inline-flex', [DESKTOP_BP]: 'none' }}
+            onClick={() => setNavBarOpen(true)}
+            icon={<BiMenu />}
+            variant="ghost"
+          />
+          <Heading size="md">
+            ToolBox
+          </Heading>
+        </HStack>
         <Spacer />
         <IconButton
           aria-label="Switch color mode"

@@ -13,10 +13,13 @@ type NavLinkItemProps = {
   to: string,
   label: string,
   exact?: boolean,
+  onNavBarClose: () => void,
 };
-function NavLinkItem({ to, label, exact }: NavLinkItemProps) {
-  const hoverBgColor = useColorModeValue('gray.200', 'gray.600');
-  const activeBgColor = useColorModeValue('gray.300', 'gray.500');
+function NavLinkItem({
+  to, label, exact, onNavBarClose,
+}: NavLinkItemProps) {
+  const hoverBgColor = useColorModeValue('gray.200', 'gray.700');
+  const activeBgColor = useColorModeValue('gray.300', 'gray.600');
   return (
     <Box as="li" listStyleType="none">
       <Button
@@ -27,6 +30,7 @@ function NavLinkItem({ to, label, exact }: NavLinkItemProps) {
         isFullWidth
         borderRadius={0}
         justifyContent="left"
+        onClick={onNavBarClose}
         _hover={{
           background: hoverBgColor,
         }}
@@ -47,12 +51,16 @@ function NavLinkItem({ to, label, exact }: NavLinkItemProps) {
   );
 }
 
-function NavBarContent() {
+type NavBarContentProps = {
+  onNavBarClose: () => void,
+};
+function NavBarContent({ onNavBarClose }: NavBarContentProps) {
   return (
     <VStack as="ul" w="full" alignItems="stretch" spacing={0}>
       <NavLinkItem
         to={RoutePath.CCPNormal}
         label="컴플리트 가챠 계산기"
+        onNavBarClose={onNavBarClose}
       />
     </VStack>
   );
