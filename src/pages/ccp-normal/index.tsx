@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  Button,
+  Center,
   Divider,
   FormControl,
   FormLabel,
@@ -57,19 +59,25 @@ function getProbTable(itemCount: number) {
     trial,
     accProbPercent,
   }];
+  let recordThreshold = 5.00;
   while (accProbPercent < 99.00) {
-    // TODO: This results in NaN for large numbers. Fix algorithm.
-    accProbPercent *= (1 + S(trial, itemCount - 1) / (itemCount * S(trial, itemCount)));
+    accProbPercent *= (1 + S(trial, itemCount - 1) / S(trial, itemCount) / itemCount);
     trial += 1;
-    ret.push({
-      trial,
-      accProbPercent,
-    });
+    if (accProbPercent > recordThreshold) {
+      ret.push({
+        trial,
+        accProbPercent,
+      });
+      if (recordThreshold < 90) recordThreshold += 5;
+      else recordThreshold += 1;
+    }
   }
   return ret;
 }
 
 function CCPNormal() {
+  const [inputStr, setInputStr] = React.useState('9');
+  const [inputNum, setInputNum] = React.useState(9);
   const [itemCount, setItemCount] = React.useState(9);
   const probTable = getProbTable(itemCount);
   return (
@@ -80,11 +88,15 @@ function CCPNormal() {
         <Text>대표적으로 캔뱃지 컴플리트 확률 계산 등에 쓰일 수 있습니다.</Text>
       </Stack>
       <FormControl id="item-count">
-        <FormLabel>전체 아이템 갯수</FormLabel>
+        <FormLabel>전체 아이템 갯수 (최대 29)</FormLabel>
         <NumberInput
           min={1}
-          value={itemCount}
-          onChange={(_, v) => setItemCount(v)}
+          max={29}
+          value={inputStr}
+          onChange={(s, n) => {
+            setInputStr(s);
+            setInputNum(n);
+          }}
         >
           <NumberInputField />
           <NumberInputStepper>
@@ -94,6 +106,11 @@ function CCPNormal() {
         </NumberInput>
         <FormHelperText>가챠에서 나올 수 있는 아이템의 갯수입니다. 모든 아이템은 균등 확률로 뽑힘을 가정합니다.</FormHelperText>
       </FormControl>
+      <Center>
+        <Button onClick={() => setItemCount(Number.isNaN(inputNum) ? 0 : inputNum)}>
+          계산하기
+        </Button>
+      </Center>
       <Divider />
       <Heading size="lg">계산 결과</Heading>
       <Stat>
@@ -105,7 +122,7 @@ function CCPNormal() {
         <Thead>
           <Tr>
             <Th>뽑기 횟수</Th>
-            <Th>컴플리트 확률</Th>
+            <Th isNumeric>컴플리트 확률</Th>
           </Tr>
         </Thead>
         <Tbody>
