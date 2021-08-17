@@ -124,7 +124,7 @@ function CCPNormal() {
         </Button>
       </Center>
       <Divider />
-      <Heading size="lg">계산 결과</Heading>
+      <Heading size="lg">{`${itemCount}개 아이템에 대한 계산 결과`}</Heading>
       <Stat>
         <StatLabel>시행 기대 횟수</StatLabel>
         <StatNumber>{`${getExpectation(itemCount).toFixed(2)}회`}</StatNumber>
