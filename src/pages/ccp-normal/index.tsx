@@ -5,6 +5,7 @@ import {
   FormLabel,
   FormHelperText,
   Heading,
+  Link,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
@@ -105,6 +106,11 @@ function CCPNormal() {
       <Stack>
         <Text>모든 아이템이 뽑힐 확률이 균등할 때, 복원 추출로 몇 회를 뽑아야 모든 아이템을 모을 수 있을지 계산하는 계산기입니다.</Text>
         <Text>대표적으로 캔뱃지 컴플리트 확률 계산 등에 쓰일 수 있습니다.</Text>
+        <Text>
+          계산에 사용한 식은&nbsp;
+          <Link href="https://math.stackexchange.com/a/1454749" isExternal color="green.500">이 링크</Link>
+          를 참조하였습니다.
+        </Text>
       </Stack>
       <FormControl id="item-count">
         <FormLabel>전체 아이템 갯수 (최대 100)</FormLabel>
