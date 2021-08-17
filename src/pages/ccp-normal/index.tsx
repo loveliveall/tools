@@ -25,17 +25,25 @@ import {
   Text,
 } from '@chakra-ui/react';
 
+function powBigInt(base: bigint, power: number): bigint {
+  // 'target' option is not set to 'es2016' or later. Create custom exponent
+  return new Array<bigint>(power).fill(base).reduce((acc, curr) => acc * curr, BigInt(1));
+}
+function divideBigInt(a: bigint, b: bigint, decimalPrecision: number): number {
+  return Number(((a * (powBigInt(BigInt(10), decimalPrecision))) / b)) / (10 ** decimalPrecision);
+}
+
 type Cache = {
-  [key: string]: number,
+  [key: string]: bigint,
 };
 const STIRLING_CACHE: Cache = {};
-function S(n: number, k: number): number {
-  if (n === 0 && k === 0) return 1;
-  if (n === 0 || k === 0) return 0;
+function S(n: number, k: number): bigint {
+  if (n === 0 && k === 0) return BigInt(1);
+  if (n === 0 || k === 0) return BigInt(0);
   const cacheKey = `${n}-${k}`;
   const cache = STIRLING_CACHE[cacheKey];
   if (cache !== undefined) return cache;
-  const val = k * S(n - 1, k) + S(n - 1, k - 1);
+  const val = BigInt(k) * S(n - 1, k) + S(n - 1, k - 1);
   STIRLING_CACHE[cacheKey] = val;
   return val;
 }
@@ -46,23 +54,27 @@ function getExpectation(itemCount: number) {
 }
 
 function getProbTable(itemCount: number) {
+  const precision = 6; // Will show to 5th digit, so calculate till 6th digit
   type ProbRow = {
     trial: number,
     accProbPercent: number,
   };
+  const nFactorial = new Array(itemCount).fill(null).map(
+    (_, idx) => BigInt(idx + 1),
+  ).reduce((acc, curr) => acc * curr, BigInt(1));
+  let denominator = powBigInt(BigInt(itemCount), itemCount);
   let trial = itemCount;
   // Initial case
-  let accProbPercent = new Array(trial).fill(null).map(
-    (_, idx) => (idx + 1) / itemCount,
-  ).reduce((acc, curr) => acc * curr, 1) * 100;
+  let accProbPercent = divideBigInt(nFactorial * BigInt(100), denominator, precision);
   const ret: ProbRow[] = [{
     trial,
     accProbPercent,
   }];
   let recordThreshold = 5.00;
   while (accProbPercent < 99.00) {
-    accProbPercent *= (1 + S(trial, itemCount - 1) / S(trial, itemCount) / itemCount);
+    denominator *= BigInt(itemCount);
     trial += 1;
+    accProbPercent = divideBigInt(nFactorial * S(trial, itemCount) * BigInt(100), denominator, precision);
     if (accProbPercent > recordThreshold) {
       ret.push({
         trial,
@@ -88,10 +100,10 @@ function CCPNormal() {
         <Text>대표적으로 캔뱃지 컴플리트 확률 계산 등에 쓰일 수 있습니다.</Text>
       </Stack>
       <FormControl id="item-count">
-        <FormLabel>전체 아이템 갯수 (최대 29)</FormLabel>
+        <FormLabel>전체 아이템 갯수 (최대 100)</FormLabel>
         <NumberInput
           min={1}
-          max={29}
+          max={100}
           value={inputStr}
           onChange={(s, n) => {
             setInputStr(s);
