@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   useColorMode,
+  useColorModeValue,
   Box,
   HStack,
   Heading,
@@ -16,6 +17,7 @@ type AppBarProps = {
 };
 function AppBar({ setNavBarOpen }: AppBarProps) {
   const { colorMode, toggleColorMode } = useColorMode();
+  const bgColor = useColorModeValue('white', 'gray.800');
   return (
     <Box
       as="header"
@@ -23,6 +25,7 @@ function AppBar({ setNavBarOpen }: AppBarProps) {
       zIndex={10}
       w="full"
       h={APP_BAR_HEIGHT}
+      bgColor={bgColor}
     >
       <HStack h="full" p={4}>
         <HStack>
