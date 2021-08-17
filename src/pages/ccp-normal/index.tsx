@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  Button,
-  Center,
   Divider,
   FormControl,
   FormLabel,
@@ -12,6 +10,10 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
   Stack,
   Stat,
   StatLabel,
@@ -90,7 +92,12 @@ function getProbTable(itemCount: number) {
 function CCPNormal() {
   const [inputStr, setInputStr] = React.useState('9');
   const [inputNum, setInputNum] = React.useState(9);
-  const [itemCount, setItemCount] = React.useState(9);
+  const itemCount = (() => {
+    if (Number.isNaN(inputNum)) return 1;
+    if (inputNum < 1) return 1;
+    if (inputNum > 100) return 100;
+    return inputNum;
+  })();
   const probTable = getProbTable(itemCount);
   return (
     <Stack spacing={6}>
@@ -101,28 +108,38 @@ function CCPNormal() {
       </Stack>
       <FormControl id="item-count">
         <FormLabel>전체 아이템 갯수 (최대 100)</FormLabel>
-        <NumberInput
-          min={1}
-          max={100}
-          value={inputStr}
-          onChange={(s, n) => {
-            setInputStr(s);
-            setInputNum(n);
-          }}
-        >
-          <NumberInputField />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
+        <Stack>
+          <NumberInput
+            min={1}
+            max={100}
+            value={inputStr}
+            onChange={(s, n) => {
+              setInputStr(s);
+              setInputNum(n);
+            }}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Slider
+            focusThumbOnChange={false}
+            value={inputNum}
+            onChange={(value) => {
+              setInputNum(value);
+              setInputStr(String(value));
+            }}
+          >
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <SliderThumb boxSize={6} />
+          </Slider>
+        </Stack>
         <FormHelperText>가챠에서 나올 수 있는 아이템의 갯수입니다. 모든 아이템은 균등 확률로 뽑힘을 가정합니다.</FormHelperText>
       </FormControl>
-      <Center>
-        <Button onClick={() => setItemCount(Number.isNaN(inputNum) ? 0 : inputNum)}>
-          계산하기
-        </Button>
-      </Center>
       <Divider />
       <Heading size="lg">{`${itemCount}개 아이템에 대한 계산 결과`}</Heading>
       <Stat>
