@@ -28,13 +28,11 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-function powBigInt(base: bigint, power: number): bigint {
-  // 'target' option is not set to 'es2016' or later. Create custom exponent
-  return new Array<bigint>(power).fill(base).reduce((acc, curr) => acc * curr, BigInt(1));
-}
-function divideBigInt(a: bigint, b: bigint, decimalPrecision: number): number {
-  return Number(((a * (powBigInt(BigInt(10), decimalPrecision))) / b)) / (10 ** decimalPrecision);
-}
+import {
+  divideBigInt,
+  powBigInt,
+  factorial,
+} from '@/utils/bigint';
 
 type Cache = {
   [key: string]: bigint,
@@ -62,9 +60,7 @@ function getProbTable(itemCount: number) {
     trial: number,
     accProbPercent: number,
   };
-  const nFactorial = new Array(itemCount).fill(null).map(
-    (_, idx) => BigInt(idx + 1),
-  ).reduce((acc, curr) => acc * curr, BigInt(1));
+  const nFactorial = factorial(itemCount);
   let denominator = powBigInt(BigInt(itemCount), itemCount);
   let trial = itemCount;
   // Initial case
@@ -97,7 +93,7 @@ function CCPNormal() {
     if (Number.isNaN(inputNum)) return 1;
     if (inputNum < 1) return 1;
     if (inputNum > 100) return 100;
-    return inputNum;
+    return Math.floor(inputNum);
   })();
   const probTable = getProbTable(itemCount);
   return (
@@ -118,6 +114,7 @@ function CCPNormal() {
           <NumberInput
             min={1}
             max={100}
+            step={1}
             value={inputStr}
             onChange={(s, n) => {
               setInputStr(s);
