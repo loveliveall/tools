@@ -25,6 +25,7 @@ import {
   Th,
   Thead,
   Tr,
+  Wrap,
 } from '@chakra-ui/react';
 import { DESKTOP_BP } from '@/consts';
 import {
@@ -35,6 +36,42 @@ import {
 
 function C(n: number, r: number): bigint {
   return factorial(n) / (factorial(r) * factorial(n - r));
+}
+
+// probPercent has precision 2, i.e., 0.01% ~ 100.00% => 1/10000 ~ 10000/10000
+function binomialPercent(n: number, r: number, probPercent: number, precision: number) {
+  // In n times of trial, what is the probability of r draw?
+  const probNumerator = probPercent * 100;
+  const denominator = powBigInt(BigInt(10000), n);
+  // nCr * p^r * (1-p)^(n-r)
+  return divideBigInt(
+    C(n, r)
+      * powBigInt(BigInt(probNumerator), r)
+      * powBigInt(BigInt(10000 - probNumerator), n - r)
+      * BigInt(100),
+    denominator,
+    precision,
+  );
+}
+
+// probPercent has precision 2, i.e., 0.01% ~ 100.00% => 1/10000 ~ 10000/10000
+function cumulativeBinomialPercent(n: number, r: number, probPercent: number, precision: number) {
+  // In n times of trial, what is the probability of at least r draw?
+  if (n < r) return NaN;
+  if (r < n / 2) {
+    // Subtraction is better
+    let accProbPercent = 0;
+    for (let i = 0; i < r; i += 1) {
+      accProbPercent += binomialPercent(n, i, probPercent, precision);
+    }
+    return 100 - accProbPercent;
+  }
+  // Addition is better
+  let accProbPercent = 0;
+  for (let i = r; i <= n; i += 1) {
+    accProbPercent += binomialPercent(n, i, probPercent, precision);
+  }
+  return accProbPercent;
 }
 
 function getSingleProbTable(probPercent: number) {
@@ -75,15 +112,9 @@ function getMultiGachaTable(probPercent: number, trial: number) {
     probPercent: number,
     accProbPercent: number,
   };
-  const probNumerator = probPercent * 100;
-  const denominator = powBigInt(BigInt(10000), trial);
   let itemCount = 0;
   // Initial case: nC0 * (1 - p)^n
-  let currProbPercent = divideBigInt(
-    C(trial, itemCount) * powBigInt(BigInt(10000 - probNumerator), trial) * BigInt(100),
-    denominator,
-    precision,
-  );
+  let currProbPercent = binomialPercent(trial, itemCount, probPercent, precision);
   let accProbPercent = currProbPercent;
   const ret: Row[] = [{
     itemCount,
@@ -93,14 +124,7 @@ function getMultiGachaTable(probPercent: number, trial: number) {
   while (itemCount < Math.min(trial, 10)) {
     itemCount += 1;
     // nCr * p^r * (1 - p)^r
-    currProbPercent = divideBigInt(
-      C(trial, itemCount)
-        * powBigInt(BigInt(probNumerator), itemCount)
-        * powBigInt(BigInt(10000 - probNumerator), trial - itemCount)
-        * BigInt(100),
-      denominator,
-      precision,
-    );
+    currProbPercent = binomialPercent(trial, itemCount, probPercent, precision);
     accProbPercent += currProbPercent;
     ret.push({
       itemCount,
@@ -111,12 +135,17 @@ function getMultiGachaTable(probPercent: number, trial: number) {
   return ret;
 }
 
+const COUNT_MAX = 1000;
 function GachaNormal() {
   const helperTextColor = useColorModeValue('gray.600', 'gray.400');
   const [probPercentInputStr, setProbPercentInputStr] = React.useState('1.00');
   const [probPercentInputNum, setProbPercentInputNum] = React.useState(1);
   const [trialInputStr, setTrialInputStr] = React.useState('1');
   const [trialInputNum, setTrialInputNum] = React.useState(1);
+  const [targetInputStr, setTargetInputStr] = React.useState('1');
+  const [targetInputNum, setTargetInputNum] = React.useState(1);
+  const [targetProbPercentStr, setTargetProbPercentStr] = React.useState('99.99');
+  const [targetProbPercentNum, setTargetProbPercentNum] = React.useState(99.99);
   const probPercent = (() => {
     if (Number.isNaN(probPercentInputNum)) return 0.01;
     if (probPercentInputNum < 0.01) return 0.01;
@@ -126,11 +155,25 @@ function GachaNormal() {
   const trial = (() => {
     if (Number.isNaN(trialInputNum)) return 1;
     if (trialInputNum < 1) return 1;
-    if (trialInputNum > 10000) return 10000;
+    if (trialInputNum > COUNT_MAX) return COUNT_MAX;
     return Math.floor(trialInputNum);
+  })();
+  const target = (() => {
+    if (Number.isNaN(targetInputNum)) return 1;
+    if (targetInputNum < 1) return 1;
+    if (targetInputNum > COUNT_MAX) return COUNT_MAX;
+    return Math.floor(targetInputNum);
+  })();
+  const targetProbPercent = (() => {
+    if (Number.isNaN(targetProbPercentNum)) return 0.01;
+    if (targetProbPercentNum < 0.01) return 0.01;
+    if (targetProbPercentNum > 99.99) return 99.99;
+    return Math.floor(targetProbPercentNum * 100) / 100;
   })();
   const singleProbTable = getSingleProbTable(probPercent);
   const multiGachaTable = getMultiGachaTable(probPercent, trial);
+  const cumulativeProbPercent = cumulativeBinomialPercent(trial, target, probPercent, 6);
+  const targetProbTrial = Math.ceil(Math.log(1 - targetProbPercent / 100) / Math.log(1 - probPercent / 100));
   return (
     <Stack spacing={6}>
       <Heading size="lg">가챠 확률 계산기</Heading>
@@ -169,6 +212,93 @@ function GachaNormal() {
       >
         <GridItem>
           <Stack spacing={6}>
+            <Heading size="lg">n회 뽑기에서 m개 이상 뽑을 확률</Heading>
+            <Wrap shouldWrapChildren spacing={6}>
+              <FormControl id="trial-count-2">
+                <FormLabel>가챠 시도 횟수 (최대 1000회)</FormLabel>
+                <HStack>
+                  <NumberInput
+                    min={1}
+                    max={COUNT_MAX}
+                    step={1}
+                    value={trialInputStr}
+                    onChange={(s, n) => {
+                      setTrialInputStr(s);
+                      setTrialInputNum(n);
+                    }}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <Text>회</Text>
+                </HStack>
+              </FormControl>
+              <FormControl id="target-count">
+                <FormLabel>목표 갯수 (최대 1000회)</FormLabel>
+                <HStack>
+                  <NumberInput
+                    min={1}
+                    max={COUNT_MAX}
+                    step={1}
+                    value={targetInputStr}
+                    onChange={(s, n) => {
+                      setTargetInputStr(s);
+                      setTargetInputNum(n);
+                    }}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <Text>회</Text>
+                </HStack>
+              </FormControl>
+            </Wrap>
+            <Stat>
+              <StatNumber>{`${cumulativeProbPercent.toFixed(5)}%`}</StatNumber>
+            </Stat>
+            <Divider />
+          </Stack>
+        </GridItem>
+        <GridItem>
+          <Stack spacing={6}>
+            <Heading size="lg">n% 이상 확률로 뽑기 위한 최소 시도 횟수</Heading>
+            <FormControl id="target-prob">
+              <FormLabel>목표 확률 (최대 99.99%)</FormLabel>
+              <HStack>
+                <NumberInput
+                  min={0.01}
+                  max={99.99}
+                  precision={2}
+                  step={0.01}
+                  value={targetProbPercentStr}
+                  onChange={(s, n) => {
+                    setTargetProbPercentStr(s);
+                    setTargetProbPercentNum(n);
+                  }}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+                <Text>%</Text>
+              </HStack>
+            </FormControl>
+            <Stat>
+              <StatNumber>{`${targetProbTrial}회`}</StatNumber>
+            </Stat>
+            <Divider />
+          </Stack>
+        </GridItem>
+        <GridItem>
+          <Stack spacing={6}>
             <Heading size="lg">1개 뽑기 계산 결과</Heading>
             <Stat>
               <StatLabel>시행 기대 횟수</StatLabel>
@@ -202,11 +332,11 @@ function GachaNormal() {
           <Stack spacing={6}>
             <Heading size="lg">다회 가챠 계산 결과</Heading>
             <FormControl id="trial-count">
-              <FormLabel>가챠 시도 횟수</FormLabel>
+              <FormLabel>가챠 시도 횟수 (최대 1000회)</FormLabel>
               <HStack>
                 <NumberInput
                   min={1}
-                  max={10000}
+                  max={1000}
                   step={1}
                   value={trialInputStr}
                   onChange={(s, n) => {

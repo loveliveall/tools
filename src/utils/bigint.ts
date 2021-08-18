@@ -1,5 +1,6 @@
 export function powBigInt(base: bigint, power: number): bigint {
   // 'target' option is not set to 'es2016' or later. Create custom exponent
+  if (power === 0) return BigInt(1);
   return new Array<bigint>(power).fill(base).reduce((acc, curr) => acc * curr, BigInt(1));
 }
 
