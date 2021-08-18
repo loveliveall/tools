@@ -56,7 +56,7 @@ type NavBarContentProps = {
 };
 function NavBarContent({ onNavBarClose }: NavBarContentProps) {
   return (
-    <VStack as="ul" w="full" alignItems="stretch" spacing={0}>
+    <VStack as="ul" w="full" alignItems="stretch" spacing={0} pt={2}>
       <NavLinkItem
         to={RoutePath.GachaNormal}
         label="가챠 확률 계산기"
