@@ -58,6 +58,11 @@ function NavBarContent({ onNavBarClose }: NavBarContentProps) {
   return (
     <VStack as="ul" w="full" alignItems="stretch" spacing={0}>
       <NavLinkItem
+        to={RoutePath.GachaNormal}
+        label="가챠 확률 계산기"
+        onNavBarClose={onNavBarClose}
+      />
+      <NavLinkItem
         to={RoutePath.CCPNormal}
         label="컴플리트 가챠 계산기"
         onNavBarClose={onNavBarClose}

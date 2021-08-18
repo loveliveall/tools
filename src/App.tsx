@@ -10,6 +10,7 @@ import NavBar from '@/components/app-frame/NavBar';
 import Content from '@/components/app-frame/Content';
 
 import CCPNormal from '@/pages/ccp-normal';
+import GachaNormal from '@/pages/gacha-normal';
 
 import { RoutePath } from '@/routes';
 
@@ -30,6 +31,7 @@ function App() {
       <Content>
         <Switch>
           <Route path={RoutePath.CCPNormal} component={CCPNormal} />
+          <Route path={RoutePath.GachaNormal} component={GachaNormal} />
           <Route component={Fallback} />
         </Switch>
       </Content>
