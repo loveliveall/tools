@@ -89,6 +89,11 @@ function getProbTable(itemCount: number) {
 function CCPNormal() {
   const [inputStr, setInputStr] = React.useState('9');
   const [inputNum, setInputNum] = React.useState(9);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const itemCount = (() => {
     if (Number.isNaN(inputNum)) return 1;
     if (inputNum < 1) return 1;

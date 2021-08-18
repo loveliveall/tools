@@ -146,6 +146,11 @@ function GachaNormal() {
   const [targetInputNum, setTargetInputNum] = React.useState(1);
   const [targetProbPercentStr, setTargetProbPercentStr] = React.useState('99.99');
   const [targetProbPercentNum, setTargetProbPercentNum] = React.useState(99.99);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const probPercent = (() => {
     if (Number.isNaN(probPercentInputNum)) return 0.01;
     if (probPercentInputNum < 0.01) return 0.01;
