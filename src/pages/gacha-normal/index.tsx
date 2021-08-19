@@ -41,7 +41,7 @@ function C(n: number, r: number): bigint {
 // probPercent has precision 2, i.e., 0.01% ~ 100.00% => 1/10000 ~ 10000/10000
 function binomialPercent(n: number, r: number, probPercent: number, precision: number) {
   // In n times of trial, what is the probability of r draw?
-  const probNumerator = probPercent * 100;
+  const probNumerator = Math.round(probPercent * 100); // rounding reason: 1.09 * 100 = 109.00000000000001 and 1.13 * 100 = 112.99999999999999
   const denominator = powBigInt(BigInt(10000), n);
   // nCr * p^r * (1-p)^(n-r)
   return divideBigInt(
