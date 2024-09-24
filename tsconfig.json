@@ -15,8 +15,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "lib": [
-      "es2015",
-      "es2017",
+      "esnext",
       "dom"
     ],
     "removeComments": true,
