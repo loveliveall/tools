@@ -1,33 +1,26 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import {
-  useColorModeValue,
-  Box,
-  Button,
-  VStack,
-} from '@chakra-ui/react';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { useColorModeValue, Box, Button, VStack } from "@chakra-ui/react";
 
-import { RoutePath } from '@/routes';
+import { RoutePath } from "@/routes";
 
 type NavLinkItemProps = {
-  to: string,
-  label: string,
-  exact?: boolean,
-  onNavBarClose: () => void,
+  to: string;
+  label: string;
+  exact?: boolean;
+  onNavBarClose: () => void;
 };
-function NavLinkItem({
-  to, label, exact, onNavBarClose,
-}: NavLinkItemProps) {
-  const hoverBgColor = useColorModeValue('gray.200', 'gray.700');
-  const activeBgColor = useColorModeValue('gray.300', 'gray.600');
+function NavLinkItem({ to, label, exact, onNavBarClose }: NavLinkItemProps) {
+  const hoverBgColor = useColorModeValue("gray.200", "gray.700");
+  const activeBgColor = useColorModeValue("gray.300", "gray.600");
   return (
     <Box as="li" listStyleType="none">
       <Button
         as={NavLink}
         to={to}
-        exact={exact}
+        end={exact}
         variant="ghost"
-        isFullWidth
+        width="full"
         borderRadius={0}
         justifyContent="left"
         onClick={onNavBarClose}
@@ -40,7 +33,7 @@ function NavLinkItem({
         // `activeStyle` prop is not working, so `sx` prop is used for workaround
         // NavLink sets `active` class on active navlink
         sx={{
-          '&.active': {
+          "&.active": {
             background: activeBgColor,
           },
         }}
@@ -52,7 +45,7 @@ function NavLinkItem({
 }
 
 type NavBarContentProps = {
-  onNavBarClose: () => void,
+  onNavBarClose: () => void;
 };
 function NavBarContent({ onNavBarClose }: NavBarContentProps) {
   return (

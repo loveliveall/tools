@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Drawer,
@@ -7,14 +7,14 @@ import {
   DrawerHeader,
   DrawerBody,
   DrawerOverlay,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-import { DESKTOP_BP, APP_BAR_HEIGHT, NAV_BAR_WIDTH } from '@/consts';
-import NavBarContent from './NavBarContent';
+import { DESKTOP_BP, APP_BAR_HEIGHT, NAV_BAR_WIDTH } from "@/consts";
+import NavBarContent from "./NavBarContent";
 
 type NavBarProps = {
-  isOpen: boolean,
-  onClose: () => void,
+  isOpen: boolean;
+  onClose: () => void;
 };
 function NavBar({ isOpen, onClose }: NavBarProps) {
   return (
@@ -22,11 +22,9 @@ function NavBar({ isOpen, onClose }: NavBarProps) {
       {/* Mobile UI */}
       <Drawer placement="left" isOpen={isOpen} onClose={onClose}>
         <DrawerOverlay />
-        <DrawerContent display={{ base: 'flex', [DESKTOP_BP]: 'none' }}>
+        <DrawerContent display={{ base: "flex", [DESKTOP_BP]: "none" }}>
           <DrawerCloseButton />
-          <DrawerHeader>
-            Toolbox
-          </DrawerHeader>
+          <DrawerHeader>Toolbox</DrawerHeader>
           <DrawerBody p={0}>
             <NavBarContent onNavBarClose={onClose} />
           </DrawerBody>
@@ -37,7 +35,7 @@ function NavBar({ isOpen, onClose }: NavBarProps) {
         as="nav"
         pos="fixed"
         top={APP_BAR_HEIGHT}
-        d={{ base: 'none', [DESKTOP_BP]: 'flex' }}
+        display={{ base: "none", [DESKTOP_BP]: "flex" }}
         w={NAV_BAR_WIDTH}
       >
         <NavBarContent onNavBarClose={onClose} />

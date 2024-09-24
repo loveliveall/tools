@@ -1,40 +1,40 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (_, argv) => {
-  const isProd = argv.mode === 'production';
+  const isProd = argv.mode === "production";
   const baseConfig = {
-    mode: isProd ? 'production' : 'development',
-    devtool: isProd ? false : 'source-map',
+    mode: isProd ? "production" : "development",
+    devtool: isProd ? false : "source-map",
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src'),
+        "@": path.resolve(__dirname, "src"),
       },
-      extensions: ['.js', '.ts', '.tsx'],
+      extensions: [".js", ".ts", ".tsx"],
     },
-    entry: path.resolve(__dirname, 'src/index'),
+    entry: path.resolve(__dirname, "src/index"),
     output: {
-      path: path.resolve(__dirname, 'build'),
-      filename: '[name].[contenthash].bundle.js',
-      chunkFilename: '[name].[chunkhash].bundle.js',
-      publicPath: '/',
+      path: path.resolve(__dirname, "build"),
+      filename: "[name].[contenthash].bundle.js",
+      chunkFilename: "[name].[chunkhash].bundle.js",
+      publicPath: "/",
     },
     module: {
       rules: [
         {
           test: /\.tsx?/,
-          loader: 'ts-loader',
+          loader: "ts-loader",
           options: {
-            configFile: path.resolve(__dirname, './tsconfig.json'),
+            configFile: path.resolve(__dirname, "./tsconfig.json"),
           },
         },
       ],
     },
     optimization: {
       splitChunks: {
-        chunks: 'all',
+        chunks: "all",
       },
     },
     plugins: [
@@ -42,15 +42,15 @@ module.exports = (_, argv) => {
       new CopyWebpackPlugin({
         patterns: [
           {
-            from: 'public',
+            from: "public",
             globOptions: {
-              ignore: ['**/index.html'],
+              ignore: ["**/index.html"],
             },
           },
         ],
       }),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, 'public/index.html'),
+        template: path.resolve(__dirname, "public/index.html"),
       }),
     ],
   };
@@ -61,7 +61,7 @@ module.exports = (_, argv) => {
   return {
     ...baseConfig,
     devServer: {
-      contentBase: './build',
+      static: "./build",
       hot: true,
       compress: true,
       historyApiFallback: true,
