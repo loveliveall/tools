@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   useColorModeValue,
   Divider,
@@ -26,36 +26,42 @@ import {
   Thead,
   Tr,
   Wrap,
-} from '@chakra-ui/react';
-import { DESKTOP_BP } from '@/consts';
-import {
-  factorial,
-  divideBigInt,
-  powBigInt,
-} from '@/utils/bigint';
+} from "@chakra-ui/react";
+import { DESKTOP_BP } from "@/consts";
+import { factorial, divideBigInt, powBigInt } from "@/utils/bigint";
 
 function C(n: number, r: number): bigint {
   return factorial(n) / (factorial(r) * factorial(n - r));
 }
 
 // probPercent has precision 2, i.e., 0.01% ~ 100.00% => 1/10000 ~ 10000/10000
-function binomialPercent(n: number, r: number, probPercent: number, precision: number) {
+function binomialPercent(
+  n: number,
+  r: number,
+  probPercent: number,
+  precision: number
+) {
   // In n times of trial, what is the probability of r draw?
   const probNumerator = Math.round(probPercent * 100); // rounding reason: 1.09 * 100 = 109.00000000000001 and 1.13 * 100 = 112.99999999999999
   const denominator = powBigInt(BigInt(10000), n);
   // nCr * p^r * (1-p)^(n-r)
   return divideBigInt(
-    C(n, r)
-      * powBigInt(BigInt(probNumerator), r)
-      * powBigInt(BigInt(10000 - probNumerator), n - r)
-      * BigInt(100),
+    C(n, r) *
+      powBigInt(BigInt(probNumerator), r) *
+      powBigInt(BigInt(10000 - probNumerator), n - r) *
+      BigInt(100),
     denominator,
-    precision,
+    precision
   );
 }
 
 // probPercent has precision 2, i.e., 0.01% ~ 100.00% => 1/10000 ~ 10000/10000
-function cumulativeBinomialPercent(n: number, r: number, probPercent: number, precision: number) {
+function cumulativeBinomialPercent(
+  n: number,
+  r: number,
+  probPercent: number,
+  precision: number
+) {
   // In n times of trial, what is the probability of at least r draw?
   if (n < r) return NaN;
   if (r < n / 2) {
@@ -77,18 +83,20 @@ function cumulativeBinomialPercent(n: number, r: number, probPercent: number, pr
 function getSingleProbTable(probPercent: number) {
   const prob = probPercent / 100;
   type ProbRow = {
-    trial: number,
-    probPercent: number,
+    trial: number;
+    probPercent: number;
   };
   let trial = 1;
   // Initial case
   let currProbPercent = (1 - (1 - prob) ** trial) * 100;
-  const ret: ProbRow[] = [{
-    trial,
-    probPercent: currProbPercent,
-  }];
-  let recordThreshold = 10.00;
-  while (currProbPercent < 99.00) {
+  const ret: ProbRow[] = [
+    {
+      trial,
+      probPercent: currProbPercent,
+    },
+  ];
+  let recordThreshold = 10.0;
+  while (currProbPercent < 99.0) {
     trial += 1;
     currProbPercent = (1 - (1 - prob) ** trial) * 100;
     if (currProbPercent > recordThreshold) {
@@ -96,9 +104,9 @@ function getSingleProbTable(probPercent: number) {
         trial,
         probPercent: currProbPercent,
       });
-      if (recordThreshold < 90.00) recordThreshold += 10.00;
-      else if (recordThreshold < 95.00) recordThreshold = 95.00;
-      else recordThreshold = 99.00;
+      if (recordThreshold < 90.0) recordThreshold += 10.0;
+      else if (recordThreshold < 95.0) recordThreshold = 95.0;
+      else recordThreshold = 99.0;
     }
   }
   return ret;
@@ -108,19 +116,26 @@ function getSingleProbTable(probPercent: number) {
 function getMultiGachaTable(probPercent: number, trial: number) {
   const precision = 6; // Will show to 5th digit, so calculate till 6th digit
   type Row = {
-    itemCount: number,
-    probPercent: number,
-    accProbPercent: number,
+    itemCount: number;
+    probPercent: number;
+    accProbPercent: number;
   };
   let itemCount = 0;
   // Initial case: nC0 * (1 - p)^n
-  let currProbPercent = binomialPercent(trial, itemCount, probPercent, precision);
-  let accProbPercent = currProbPercent;
-  const ret: Row[] = [{
+  let currProbPercent = binomialPercent(
+    trial,
     itemCount,
-    probPercent: currProbPercent,
-    accProbPercent,
-  }];
+    probPercent,
+    precision
+  );
+  let accProbPercent = currProbPercent;
+  const ret: Row[] = [
+    {
+      itemCount,
+      probPercent: currProbPercent,
+      accProbPercent,
+    },
+  ];
   while (itemCount < Math.min(trial, 10)) {
     itemCount += 1;
     // nCr * p^r * (1 - p)^r
@@ -137,19 +152,16 @@ function getMultiGachaTable(probPercent: number, trial: number) {
 
 const COUNT_MAX = 1000;
 function GachaNormal() {
-  const helperTextColor = useColorModeValue('gray.600', 'gray.400');
-  const [probPercentInputStr, setProbPercentInputStr] = React.useState('1.00');
+  const helperTextColor = useColorModeValue("gray.600", "gray.400");
+  const [probPercentInputStr, setProbPercentInputStr] = React.useState("1.00");
   const [probPercentInputNum, setProbPercentInputNum] = React.useState(1);
-  const [trialInputStr, setTrialInputStr] = React.useState('1');
+  const [trialInputStr, setTrialInputStr] = React.useState("1");
   const [trialInputNum, setTrialInputNum] = React.useState(1);
-  const [targetInputStr, setTargetInputStr] = React.useState('1');
+  const [targetInputStr, setTargetInputStr] = React.useState("1");
   const [targetInputNum, setTargetInputNum] = React.useState(1);
-  const [targetProbPercentStr, setTargetProbPercentStr] = React.useState('99.99');
+  const [targetProbPercentStr, setTargetProbPercentStr] =
+    React.useState("99.99");
   const [targetProbPercentNum, setTargetProbPercentNum] = React.useState(99.99);
-
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const probPercent = (() => {
     if (Number.isNaN(probPercentInputNum)) return 0.01;
@@ -177,8 +189,15 @@ function GachaNormal() {
   })();
   const singleProbTable = getSingleProbTable(probPercent);
   const multiGachaTable = getMultiGachaTable(probPercent, trial);
-  const cumulativeProbPercent = cumulativeBinomialPercent(trial, target, probPercent, 6);
-  const targetProbTrial = Math.ceil(Math.log(1 - targetProbPercent / 100) / Math.log(1 - probPercent / 100));
+  const cumulativeProbPercent = cumulativeBinomialPercent(
+    trial,
+    target,
+    probPercent,
+    6
+  );
+  const targetProbTrial = Math.ceil(
+    Math.log(1 - targetProbPercent / 100) / Math.log(1 - probPercent / 100)
+  );
   return (
     <Stack spacing={6}>
       <Heading size="lg">가챠 확률 계산기</Heading>
@@ -208,11 +227,16 @@ function GachaNormal() {
           </NumberInput>
           <Text>%</Text>
         </HStack>
-        <FormHelperText>1회의 가챠에서 원하는 아이템이 나올 확률입니다.</FormHelperText>
+        <FormHelperText>
+          1회의 가챠에서 원하는 아이템이 나올 확률입니다.
+        </FormHelperText>
       </FormControl>
       <Divider />
       <Grid
-        templateColumns={{ base: 'repeat(1, 1fr)', [DESKTOP_BP]: 'repeat(2, 1fr)' }}
+        templateColumns={{
+          base: "repeat(1, 1fr)",
+          [DESKTOP_BP]: "repeat(2, 1fr)",
+        }}
         gap={4}
       >
         <GridItem>
@@ -311,7 +335,10 @@ function GachaNormal() {
             </Stat>
             <Stack>
               <Heading size="md">1개 이상 뽑기 확률표 (99%까지)</Heading>
-              <Text color={helperTextColor}>(가챠 횟수)번 가챠를 시도하면 (확률) 확률로 1개 이상 뽑을 수 있습니다.</Text>
+              <Text color={helperTextColor}>
+                (가챠 횟수)번 가챠를 시도하면 (확률) 확률로 1개 이상 뽑을 수
+                있습니다.
+              </Text>
             </Stack>
             <Table>
               <Thead>
@@ -360,7 +387,10 @@ function GachaNormal() {
             </FormControl>
             <Stack>
               <Heading size="md">뽑기 갯수 확률표 (10개까지)</Heading>
-              <Text color={helperTextColor}>주어진 횟수만큼 가챠를 시도하면 (뽑은 갯수)개 뽑을 확률이 (확률)입니다.</Text>
+              <Text color={helperTextColor}>
+                주어진 횟수만큼 가챠를 시도하면 (뽑은 갯수)개 뽑을 확률이
+                (확률)입니다.
+              </Text>
             </Stack>
             <Table>
               <Thead>

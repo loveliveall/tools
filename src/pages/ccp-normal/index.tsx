@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Divider,
   FormControl,
@@ -26,16 +26,12 @@ import {
   Th,
   Td,
   Text,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-import {
-  divideBigInt,
-  powBigInt,
-  factorial,
-} from '@/utils/bigint';
+import { divideBigInt, powBigInt, factorial } from "@/utils/bigint";
 
 type Cache = {
-  [key: string]: bigint,
+  [key: string]: bigint;
 };
 const STIRLING_CACHE: Cache = {};
 function S(n: number, k: number): bigint {
@@ -50,30 +46,43 @@ function S(n: number, k: number): bigint {
 }
 
 function getExpectation(itemCount: number) {
-  const harmonic = new Array(itemCount).fill(null).map((_, idx) => 1 / (idx + 1)).reduce((acc, curr) => acc + curr, 0);
+  const harmonic = new Array(itemCount)
+    .fill(null)
+    .map((_, idx) => 1 / (idx + 1))
+    .reduce((acc, curr) => acc + curr, 0);
   return itemCount * harmonic;
 }
 
 function getProbTable(itemCount: number) {
   const precision = 6; // Will show to 5th digit, so calculate till 6th digit
   type ProbRow = {
-    trial: number,
-    accProbPercent: number,
+    trial: number;
+    accProbPercent: number;
   };
   const nFactorial = factorial(itemCount);
   let denominator = powBigInt(BigInt(itemCount), itemCount);
   let trial = itemCount;
   // Initial case
-  let accProbPercent = divideBigInt(nFactorial * BigInt(100), denominator, precision);
-  const ret: ProbRow[] = [{
-    trial,
-    accProbPercent,
-  }];
-  let recordThreshold = 5.00;
-  while (accProbPercent < 99.00) {
+  let accProbPercent = divideBigInt(
+    nFactorial * BigInt(100),
+    denominator,
+    precision
+  );
+  const ret: ProbRow[] = [
+    {
+      trial,
+      accProbPercent,
+    },
+  ];
+  let recordThreshold = 5.0;
+  while (accProbPercent < 99.0) {
     denominator *= BigInt(itemCount);
     trial += 1;
-    accProbPercent = divideBigInt(nFactorial * S(trial, itemCount) * BigInt(100), denominator, precision);
+    accProbPercent = divideBigInt(
+      nFactorial * S(trial, itemCount) * BigInt(100),
+      denominator,
+      precision
+    );
     if (accProbPercent > recordThreshold) {
       ret.push({
         trial,
@@ -87,12 +96,8 @@ function getProbTable(itemCount: number) {
 }
 
 function CCPNormal() {
-  const [inputStr, setInputStr] = React.useState('9');
+  const [inputStr, setInputStr] = React.useState("9");
   const [inputNum, setInputNum] = React.useState(9);
-
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const itemCount = (() => {
     if (Number.isNaN(inputNum)) return 1;
@@ -105,11 +110,20 @@ function CCPNormal() {
     <Stack spacing={6}>
       <Heading size="lg">컴플리트 가챠 계산기</Heading>
       <Stack>
-        <Text>모든 아이템이 뽑힐 확률이 균등할 때, 복원 추출로 몇 회를 뽑아야 모든 아이템을 모을 수 있을지 계산하는 계산기입니다.</Text>
+        <Text>
+          모든 아이템이 뽑힐 확률이 균등할 때, 복원 추출로 몇 회를 뽑아야 모든
+          아이템을 모을 수 있을지 계산하는 계산기입니다.
+        </Text>
         <Text>대표적으로 캔뱃지 컴플리트 확률 계산 등에 쓰일 수 있습니다.</Text>
         <Text>
           계산에 사용한 식은&nbsp;
-          <Link href="https://math.stackexchange.com/a/1454749" isExternal color="green.500">이 링크</Link>
+          <Link
+            href="https://math.stackexchange.com/a/1454749"
+            isExternal
+            color="green.500"
+          >
+            이 링크
+          </Link>
           를 참조하였습니다.
         </Text>
       </Stack>
@@ -146,7 +160,10 @@ function CCPNormal() {
             <SliderThumb boxSize={6} />
           </Slider>
         </Stack>
-        <FormHelperText>가챠에서 나올 수 있는 아이템의 갯수입니다. 모든 아이템은 균등 확률로 뽑힘을 가정합니다.</FormHelperText>
+        <FormHelperText>
+          가챠에서 나올 수 있는 아이템의 갯수입니다. 모든 아이템은 균등 확률로
+          뽑힘을 가정합니다.
+        </FormHelperText>
       </FormControl>
       <Divider />
       <Heading size="lg">{`${itemCount}개 아이템에 대한 계산 결과`}</Heading>

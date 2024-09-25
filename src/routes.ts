@@ -1,4 +1,5 @@
 export enum RoutePath {
-  CCPNormal = '/ccp-normal',
-  GachaNormal = '/gacha-normal',
+  CCPNormal = "/ccp-normal",
+  CCPSimulation = "/ccp-simulation",
+  GachaNormal = "/gacha-normal",
 }

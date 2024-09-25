@@ -1,10 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider } from "@chakra-ui/react";
 
-import App from '@/App';
+import App from "@/App";
 
 function Root() {
   return (
@@ -16,7 +16,5 @@ function Root() {
   );
 }
 
-ReactDOM.render(
-  <Root />,
-  document.getElementById('app'),
-);
+const root = createRoot(document.getElementById("app")!);
+root.render(<Root />);

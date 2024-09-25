@@ -60,6 +60,11 @@ function NavBarContent({ onNavBarClose }: NavBarContentProps) {
         label="컴플리트 가챠 계산기"
         onNavBarClose={onNavBarClose}
       />
+      <NavLinkItem
+        to={RoutePath.CCPSimulation}
+        label="컴플리트 가챠 시뮬레이션"
+        onNavBarClose={onNavBarClose}
+      />
     </VStack>
   );
 }
