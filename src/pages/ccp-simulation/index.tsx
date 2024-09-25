@@ -94,15 +94,21 @@ function parseItemGroupList(str: string): [ItemGroupInfo[], string | null] {
     if (!percentStr) {
       continue;
     }
-    // Avoid floating-point problem
-    const percent = new Decimal(percentStr).mul(MULTIPLIER).floor();
-    if (percent.isNaN()) {
+    const percent = (() => {
+      try {
+        return new Decimal(percentStr);
+      } catch {
+        return null;
+      }
+    })();
+    if (!percent || percent.isNaN()) {
       return [[], `${i + 1}번째 줄: 추출 확률은 숫자여야 합니다.`];
     }
     if (percent.lte(0)) {
       return [[], `${i + 1}번째 줄: 추출 확률은 양수여야 합니다.`];
     }
-    const normalizedProb = percent.toNumber();
+    // Avoid floating-point problem
+    const normalizedProb = percent.mul(MULTIPLIER).floor().toNumber();
     const quantity = quantityStr ? Math.floor(Number(quantityStr)) : 1;
     if (Number.isNaN(quantity)) {
       return [[], `${i + 1}번째 줄: 수량은 숫자여야 합니다.`];
