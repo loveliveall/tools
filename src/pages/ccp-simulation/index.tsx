@@ -404,27 +404,37 @@ function CCPSimulation() {
         </>
       )}
       {simulationStatus.finishedLog.length > 0 && (
-        <Stack spacing={0.5}>
-          <Heading size="md">시뮬레이션 간단 요약</Heading>
-          <Text>뽑기 횟수 최소값: {sortedSimulationData.at(0)}회</Text>
-          <Text>뽑기 횟수 최대값: {sortedSimulationData.at(-1)}회</Text>
-          <Text>
-            뽑기 횟수 중앙값:{" "}
-            {sortedSimulationData.length % 2 === 0
-              ? (sortedSimulationData.at(sortedSimulationData.length / 2 - 1)! +
-                  sortedSimulationData.at(sortedSimulationData.length / 2)!) /
-                2
-              : sortedSimulationData.at((sortedSimulationData.length - 1) / 2)}
-            회
-          </Text>
-          <Text>
-            뽑기 횟수 평균값:{" "}
-            {(
-              sortedSimulationData.reduce((acc, curr) => acc + curr, 0) /
-              sortedSimulationData.length
-            ).toFixed(2)}
-            회
-          </Text>
+        <Stack>
+          <Stack spacing={0.5}>
+            <Heading size="md">시뮬레이션 간단 요약</Heading>
+            <Text>뽑기 횟수 최소값: {sortedSimulationData.at(0)}회</Text>
+            <Text>뽑기 횟수 최대값: {sortedSimulationData.at(-1)}회</Text>
+            <Text>
+              뽑기 횟수 중앙값:{" "}
+              {sortedSimulationData.length % 2 === 0
+                ? (sortedSimulationData.at(
+                    sortedSimulationData.length / 2 - 1
+                  )! +
+                    sortedSimulationData.at(sortedSimulationData.length / 2)!) /
+                  2
+                : sortedSimulationData.at(
+                    (sortedSimulationData.length - 1) / 2
+                  )}
+              회
+            </Text>
+            <Text>
+              뽑기 횟수 평균값:{" "}
+              {(
+                sortedSimulationData.reduce((acc, curr) => acc + curr, 0) /
+                sortedSimulationData.length
+              ).toFixed(2)}
+              회
+            </Text>
+          </Stack>
+          <Stack spacing={0.5}>
+            <Heading size="md">시뮬레이션 전체 기록</Heading>
+            <Text>{sortedSimulationData.join(", ")}</Text>
+          </Stack>
         </Stack>
       )}
     </Stack>
