@@ -54,14 +54,7 @@ function main(
       return;
     }
 
-    function singlePick(pickCount: number, completed: Set<string>) {
-      if (completed.size >= itemProbSpace.length) {
-        postMessage(endCurrentTrialMsg());
-        // Target item all completed. Execute next loop.
-        setTimeout(() => singleSimulation(trialCount + 1), 0);
-        return;
-      }
-
+    function bulkPick(pickCount: number, completed: Set<string>) {
       if (abortRequested) {
         // Abort signal received. Stop picking and send done message.
         abortRequested = false;
@@ -69,33 +62,43 @@ function main(
         return;
       }
 
-      const pick = Math.random() * totalProbSpace;
-      const pickedItem = itemProbSpace.find(
-        (item) => item.lowerBound <= pick && pick < item.upperBound
-      );
-      if (
-        pickedItem !== undefined &&
-        !completed.has(
-          getItemId(pickedItem.itemGroupIndex, pickedItem.itemEntityIndex)
-        )
-      ) {
-        // A new item picked! Add it to the completed set.
-        completed.add(
-          getItemId(pickedItem.itemGroupIndex, pickedItem.itemEntityIndex)
+      const BULK_SIZE = 1_000_000;
+
+      for (let i = 0; i < BULK_SIZE; i += 1) {
+        if (completed.size >= itemProbSpace.length) {
+          postMessage(endCurrentTrialMsg());
+          // Target item all completed. Execute next loop.
+          setTimeout(() => singleSimulation(trialCount + 1), 0);
+          return;
+        }
+        const pick = Math.random() * totalProbSpace;
+        const pickedItem = itemProbSpace.find(
+          (item) => item.lowerBound <= pick && pick < item.upperBound
         );
-        postMessage(
-          updateCurrentTrialMsg(
-            pickedItem.itemGroupIndex,
-            pickedItem.itemEntityIndex,
-            pickCount
+        if (
+          pickedItem !== undefined &&
+          !completed.has(
+            getItemId(pickedItem.itemGroupIndex, pickedItem.itemEntityIndex)
           )
-        );
+        ) {
+          // A new item picked! Add it to the completed set.
+          completed.add(
+            getItemId(pickedItem.itemGroupIndex, pickedItem.itemEntityIndex)
+          );
+          postMessage(
+            updateCurrentTrialMsg(
+              pickedItem.itemGroupIndex,
+              pickedItem.itemEntityIndex,
+              pickCount + i
+            )
+          );
+        }
       }
-      // Execute next pick
-      setTimeout(() => singlePick(pickCount + 1, completed), 0);
+      // Execute next bulk pick
+      setTimeout(() => bulkPick(pickCount + BULK_SIZE, completed), 0);
     }
 
-    singlePick(1, new Set());
+    bulkPick(1, new Set());
   }
   // Start the first loop
   singleSimulation(1);

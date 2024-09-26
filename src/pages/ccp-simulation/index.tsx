@@ -217,7 +217,7 @@ function CCPSimulation() {
 
   const sortedSimulationData = simulationStatus.finishedLog
     .map(({ totalPickCount }) => totalPickCount)
-    .toSorted();
+    .toSorted((a, b) => a - b);
 
   return (
     <Stack spacing={6} paddingBottom={8}>
